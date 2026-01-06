@@ -1,4 +1,4 @@
-#include <InGa/gfx/context.h>
+#include <InGa/gfx/Context.h>
 #include <InGa/gfx/vulkan/vk_types.h>
 #include <InGa/core/log.h>
 

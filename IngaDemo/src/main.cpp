@@ -1,6 +1,6 @@
-#include <InGa/core/window.h>
-#include <InGa/gfx/render_device.h>
-#include <InGa/gfx/context.h>
+#include <InGa/core/Window.h>
+#include <InGa/gfx/RenderDevice.h>
+#include <InGa/gfx/Context.h>
 #include <InGa/core/log.h>
 
 using namespace Inga;

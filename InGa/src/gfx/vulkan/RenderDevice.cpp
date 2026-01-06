@@ -1,4 +1,4 @@
-#include <InGa/gfx/render_device.h>
+#include <InGa/gfx/RenderDevice.h>
 #include <InGa/core/log.h>
 #include <InGa/core/container.h>
 #include <cstring>

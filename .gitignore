@@ -23,6 +23,6 @@ inga_cmd_history
 *.swo
 *.log
 */tags
-*/.cache
+.cache/
 */*.log
 */.cache

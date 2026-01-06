@@ -32,6 +32,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(InGa PUBLIC INGA_DEBUG)
 endif()
 
+find_package(Vulkan REQUIRED)
+
 # --- Include Directories ---
 target_include_directories(InGa
     PUBLIC 
@@ -42,7 +44,9 @@ target_include_directories(InGa
 )
 
 # --- Linker Setup ---
-target_link_libraries(InGa PUBLIC ${Vulkan_LIBRARIES})
+target_link_libraries(InGa PUBLIC 
+  Vulkan::Vulkan
+)
 
 if(UNIX AND NOT APPLE)
     # Link native Linux windowing libraries

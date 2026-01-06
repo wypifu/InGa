@@ -1,4 +1,4 @@
-#include <InGa/core/window.h>
+#include <InGa/core/Window.h>
 #include <InGa/core/log.h>
 #include <cstring>
 

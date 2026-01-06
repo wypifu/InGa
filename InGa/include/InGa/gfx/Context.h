@@ -3,8 +3,8 @@
 
 #include "vulkan/vk_types.h"
 #include <InGa/core/export.h>
-#include <InGa/core/window.h>
-#include <InGa/gfx/render_device.h>
+#include <InGa/core/Window.h>
+#include <InGa/gfx/RenderDevice.h>
 
 namespace Inga
 {
