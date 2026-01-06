@@ -45,17 +45,40 @@ struct SSwapchain
   Vector<VkImageView> m_imageViews;
 
   // Synchronisation par frame
-  Vector<VkSemaphore> m_imageAvailableSemaphores;
   Vector<VkSemaphore> m_renderFinishedSemaphores;
-  Vector<VkFence>     m_inFlightFences;
 
   // Suivi des images utilisées par les frames en vol
   // On utilise des pointeurs ou des index pour lier les Fences aux images
   Vector<VkFence>     m_imagesInFlight; 
   U32 m_currentFrame =  0;
+  U32 m_maxImageInFlight = 2;
 
   void cleanup(VkDevice device);
 };
+
+struct SCommandPool
+{
+    VkCommandPool 		commandPool;
+    VkCommandPoolCreateFlags    flags;
+    const void * pNext;
+    U32  queueIndex;
+    U8 resetable;
+};
+
+struct SCommandBufferFrame
+{
+    VkCommandBuffer cmd;
+    VkFence         inFlight;
+    VkSemaphore     imageAvailable;
+};
+
+struct SCommanBuffer
+{
+    SCommandPool* pool;
+    VkCommandBuffer cmd;
+    VkFence         inFlight;
+};
+
 }
 
 #endif

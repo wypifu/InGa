@@ -19,7 +19,7 @@ namespace Inga
         bool findPresentQueue(VkSurfaceKHR surface);
 
         // Getters
-        VkDevice getLogicalDevice() const { return m_logicalDevice; }
+        VkDevice getDevice() const { return m_logicalDevice; }
         VkInstance getInstance() const { return m_instance; }
         VkPhysicalDevice getPhysicalDevice() const { return m_physicalDevice; }
         
@@ -27,6 +27,7 @@ namespace Inga
         inline U32 getPresentQueueFamily()  const { return m_presentQueueFamily; }
         inline U32 getComputeQueueFamily()  const { return m_computeQueueFamily; }
         inline U32 getTransferQueueFamily() const { return m_transferQueueFamily; }
+        inline U8 isInitialized() const { return m_isInitialized; }
 
     private:
         bool createInstance(const char* appName, bool enableValidation);
@@ -42,16 +43,17 @@ namespace Inga
         VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
         VkDevice         m_logicalDevice  = VK_NULL_HANDLE;
 
-        U32 m_graphicsQueueFamily = 0xFFFFFFFF;
-        U32 m_presentQueueFamily  = 0xFFFFFFFF;
-        U32 m_computeQueueFamily  = 0xFFFFFFFF;
-        U32 m_transferQueueFamily = 0xFFFFFFFF;
         VkQueue m_graphicsQueue = VK_NULL_HANDLE;
         VkQueue m_presentQueue = VK_NULL_HANDLE;
         VkQueue m_computeQueue  = VK_NULL_HANDLE;
         VkQueue m_transferQueue = VK_NULL_HANDLE;
 
         VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
+        U32 m_graphicsQueueFamily = 0xFFFFFFFF;
+        U32 m_presentQueueFamily  = 0xFFFFFFFF;
+        U32 m_computeQueueFamily  = 0xFFFFFFFF;
+        U32 m_transferQueueFamily = 0xFFFFFFFF;
+        U8 m_isInitialized = 0;
         bool m_enableValidation;
     };
 }

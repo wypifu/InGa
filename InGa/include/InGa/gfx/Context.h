@@ -8,17 +8,27 @@
 
 namespace Inga
 {
-    struct SContextInfo; // À définir selon tes besoins (taille fenêtre, titre, etc.)
+    struct SContextConf
+    {
+        const char* windowTitle;
+        U32 width;
+        U32 height;
+
+        // Configurable Vulkan settings
+        VkPresentModeKHR preferredPresentMode;
+        U8               enableValidation;
+        U8               useHighPerformanceGpu; // If you have Integrated + Dedicated
+    };
 
     class INGA_API CContext
     {
     public:
         // On passe le RenderDevice au constructeur (Injection de dépendance)
-        CContext(CRenderDevice* device);
+        CContext() = default;
         ~CContext();
 
         bool setupSwapchain(const Window& window);
-        bool initialize(const SContextInfo& info);
+        bool initialize(CRenderDevice * pSharedGPU, const SContextConf& info);
         void update();
         void draw();
         void shutdown();
@@ -27,10 +37,15 @@ namespace Inga
 private:
 
     bool createSurface(const Window & window, VkInstance instance);
+    void initCommandResources();
 
     private:
+		Window m_window;
+        SContextConf m_config;
         CRenderDevice* m_renderDevice = nullptr;
         SSwapchain m_swapchain;
+        SCommandPool m_cmdPoolGFX;
+        Vector<SCommandBufferFrame> m_cmdFrames;
     };
 }
 

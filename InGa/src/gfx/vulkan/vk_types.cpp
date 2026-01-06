@@ -13,11 +13,9 @@ void SSwapchain::cleanup(VkDevice device)
     }
 
     // 2. Détruire la synchronisation
-    for (U32 i = 0; i < m_inFlightFences.size(); ++i)
+    for (U32 i = 0; i < m_renderFinishedSemaphores.size(); ++i)
     {
-        vkDestroySemaphore(device, m_imageAvailableSemaphores[i], nullptr);
         vkDestroySemaphore(device, m_renderFinishedSemaphores[i], nullptr);
-        vkDestroyFence(device, m_inFlightFences[i], nullptr);
     }
 
     // 3. Détruire la swapchain elle-même

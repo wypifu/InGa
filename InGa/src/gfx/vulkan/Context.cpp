@@ -1,6 +1,7 @@
 #include <InGa/gfx/Context.h>
 #include <InGa/gfx/vulkan/vk_types.h>
 #include <InGa/core/log.h>
+#include <algorithm>
 
 
 #if defined(INGA_PLATFORM_LINUX)
@@ -24,19 +25,44 @@
 namespace Inga
 {
 
-CContext::CContext(CRenderDevice * device)
-{
-  m_renderDevice = device;
-}
-
 CContext::~CContext()
 {
+}
+
+bool CContext::initialize(CRenderDevice * pSharedGPU, const SContextConf& info)
+{
+    m_renderDevice = pSharedGPU;
+    m_config = info;
+    if (!m_window.create(m_config.width, m_config.height, m_config.windowTitle))
+    {
+        INGA_LOG(eFATAL, "CONTEXT", "Failed to create window.");
+        return false;
+    }
+
+    if (!m_renderDevice->isInitialized())
+    {
+		if (!m_renderDevice->initialize("appname", true))
+		{
+        INGA_LOG(eFATAL, "DEMO", "Failed to initialize render device.");
+        return false;
+		}
+
+    }
+
+    if (!setupSwapchain(m_window))
+    {
+        INGA_LOG(eFATAL, "CONTEXT", "Failed to setup swapchain context.");
+        return false;
+    }
+
+    this->initCommandResources();
+    return true;
 }
 
 bool CContext::setupSwapchain(const Window& window)
 {
     if (!m_renderDevice) return false;
-    VkDevice device =  m_renderDevice->getLogicalDevice();
+    VkDevice device =  m_renderDevice->getDevice();
     
     // 1. Création de la Surface (Multi-backend)
     if (!createSurface(window, m_renderDevice->getInstance()))
@@ -62,7 +88,18 @@ bool CContext::setupSwapchain(const Window& window)
 
     // 2. Configuration (On pourra automatiser la sélection du format plus tard)
     m_swapchain.m_format = VK_FORMAT_B8G8R8A8_SRGB;
-    m_swapchain.m_extent = { window.getWidth(), window.getHeight() };
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderDevice->getPhysicalDevice(), m_swapchain.m_surface, &capabilities);
+    if (capabilities.currentExtent.width != 0xFFFFFFFF)
+    {
+        m_swapchain.m_extent =  capabilities.currentExtent;
+    }
+    else
+    {
+        // If we have freedom, we clamp our desired size (1280x720) to the allowed bounds
+        m_swapchain.m_extent.width = std::clamp(window.getWidth(), capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        m_swapchain.m_extent.height = std::clamp(window.getHeight(), capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
 
   VkSwapchainCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -211,22 +248,55 @@ bool CContext::createSurface(const Window& window, VkInstance instance)
 void CContext::setupSyncObjects()
 {
     U32 imageCount = static_cast<U32>(m_swapchain.m_images.size());
-    // Ta logique : N-1 images en vol
-    U32 maxFramesInFlight = (imageCount > 1) ? (imageCount - 1) : 1;
+    m_swapchain.m_maxImageInFlight = (imageCount > 1) ? imageCount - 1 : 1;
 
-    m_swapchain.m_imageAvailableSemaphores.resize(maxFramesInFlight);
-    m_swapchain.m_renderFinishedSemaphores.resize(maxFramesInFlight);
-    m_swapchain.m_inFlightFences.resize(maxFramesInFlight);
+    m_swapchain.m_renderFinishedSemaphores.resize(imageCount);
+    m_swapchain.m_imagesInFlight.resize(imageCount);
 
     VkSemaphoreCreateInfo semInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, nullptr, 0};
-    VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO , nullptr, 0};
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    for (U32 i = 0; i < maxFramesInFlight; i++)
+    for (U32 i = 0; i < imageCount; i++)
     {
-        vkCreateSemaphore(m_renderDevice->getLogicalDevice(), &semInfo, nullptr, &m_swapchain.m_imageAvailableSemaphores[i]);
-        vkCreateSemaphore(m_renderDevice->getLogicalDevice(), &semInfo, nullptr, &m_swapchain.m_renderFinishedSemaphores[i]);
-        vkCreateFence(m_renderDevice->getLogicalDevice(), &fenceInfo, nullptr, &m_swapchain.m_inFlightFences[i]);
+        vkCreateSemaphore(m_renderDevice->getDevice(), &semInfo, nullptr, &m_swapchain.m_renderFinishedSemaphores[i]);
+    }
+}
+
+void CContext::initCommandResources()
+{
+    m_cmdPoolGFX.queueIndex = m_renderDevice->getGraphicsQueueFamily();
+    m_cmdPoolGFX.resetable = 1;
+
+    VkCommandPoolCreateInfo poolInfo = { VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
+    poolInfo.queueFamilyIndex = m_cmdPoolGFX.queueIndex;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    if (vkCreateCommandPool(m_renderDevice->getDevice(), &poolInfo, nullptr, &m_cmdPoolGFX.commandPool) != VK_SUCCESS)
+    {
+		INGA_LOG(eINFO, "VULKAN", "Vulkan Context cleaned up successfully.");
+        return;
+    }
+
+    // 2. Initialize the Frames (2 flights)
+    U32 flightCount = m_swapchain.m_maxImageInFlight;
+    m_cmdFrames.resize(flightCount);
+
+    for (U32 i = 0; i < flightCount; i++)
+    {
+        SCommandBufferFrame& frame = m_cmdFrames[i];
+
+        VkCommandBufferAllocateInfo allocInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
+        allocInfo.commandPool = m_cmdPoolGFX.commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
+        vkAllocateCommandBuffers(m_renderDevice->getDevice(), &allocInfo, &frame.cmd);
+
+        VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        vkCreateFence(m_renderDevice->getDevice(), &fenceInfo, nullptr, &frame.inFlight);
+
+        // GPU Semaphore
+        VkSemaphoreCreateInfo semInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+        vkCreateSemaphore(m_renderDevice->getDevice(), &semInfo, nullptr, &frame.imageAvailable);
     }
 }
 
@@ -234,9 +304,20 @@ void CContext::cleanup()
 {
     if (!m_renderDevice) return;
 
-    VkDevice logicalDevice = m_renderDevice->getLogicalDevice();
+    VkDevice logicalDevice = m_renderDevice->getDevice();
 
     vkDeviceWaitIdle(logicalDevice);
+    for (U32 i = 0; i < m_cmdFrames.size(); i++)
+    {
+        SCommandBufferFrame& frame = m_cmdFrames[i];
+
+        vkDestroyFence(m_renderDevice->getDevice(), frame.inFlight, nullptr);
+        vkDestroySemaphore(m_renderDevice->getDevice(), frame.imageAvailable, nullptr);
+        vkFreeCommandBuffers(m_renderDevice->getDevice(), m_cmdPoolGFX.commandPool, 1, &frame.cmd);
+    }
+
+    // 3. Destroy the Pool
+    vkDestroyCommandPool(m_renderDevice->getDevice(), m_cmdPoolGFX.commandPool, nullptr);
 
     m_swapchain.cleanup(logicalDevice);
 

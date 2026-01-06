@@ -44,6 +44,7 @@ namespace Inga
         }
 
         INGA_LOG(eINFO, "VULKAN", "RenderDevice initialized successfully.");
+        m_isInitialized = 1;
         return true;
     }
 
