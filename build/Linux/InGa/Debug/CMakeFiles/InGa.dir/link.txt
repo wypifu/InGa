@@ -1,1 +1,0 @@
-/usr/sbin/c++ -fPIC -g -shared -Wl,--dependency-file=CMakeFiles/InGa.dir/link.d -Wl,-soname,libInGa.so -o libInGa.so CMakeFiles/InGa.dir/src/core/allocator.cpp.o

@@ -1,6 +1,0 @@
-/home/alan/volk/build/CMakeFiles/IngaDemo.dir
-/home/alan/volk/build/CMakeFiles/edit_cache.dir
-/home/alan/volk/build/CMakeFiles/rebuild_cache.dir
-/home/alan/volk/build/Linux/InGa/Debug/CMakeFiles/InGa.dir
-/home/alan/volk/build/Linux/InGa/Debug/CMakeFiles/edit_cache.dir
-/home/alan/volk/build/Linux/InGa/Debug/CMakeFiles/rebuild_cache.dir

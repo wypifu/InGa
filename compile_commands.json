@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/alan/volk/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/allocator.cpp.o -c /home/alan/volk/InGa/src/core/allocator.cpp",
+  "file": "/home/alan/volk/InGa/src/core/allocator.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/allocator.cpp.o"
+},
+{
+  "directory": "/home/alan/volk/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/log.cpp.o -c /home/alan/volk/InGa/src/core/log.cpp",
+  "file": "/home/alan/volk/InGa/src/core/log.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/log.cpp.o"
+},
+{
+  "directory": "/home/alan/volk/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/clock.cpp.o -c /home/alan/volk/InGa/src/core/clock.cpp",
+  "file": "/home/alan/volk/InGa/src/core/clock.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/clock.cpp.o"
+},
+{
+  "directory": "/home/alan/volk/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/timer.cpp.o -c /home/alan/volk/InGa/src/core/timer.cpp",
+  "file": "/home/alan/volk/InGa/src/core/timer.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/timer.cpp.o"
+},
+{
+  "directory": "/home/alan/volk/build/IngaDemo",
+  "command": "/usr/sbin/c++  -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -std=gnu++23 -o CMakeFiles/IngaDemo.dir/src/main.cpp.o -c /home/alan/volk/IngaDemo/src/main.cpp",
+  "file": "/home/alan/volk/IngaDemo/src/main.cpp",
+  "output": "IngaDemo/CMakeFiles/IngaDemo.dir/src/main.cpp.o"
+}
+]

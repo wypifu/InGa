@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/alan/volk/build/cmake_install.cmake",
-		"/home/alan/volk/build/Linux/InGa/Debug/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

@@ -1,1 +1,0 @@
-/usr/sbin/c++ -g -Wl,-rpath,'$ORIGIN/../../InGa/Debug' -Wl,--dependency-file=CMakeFiles/IngaDemo.dir/link.d CMakeFiles/IngaDemo.dir/src/main.cpp.o -o Linux/IngaDemo/Debug/IngaDemo  -Wl,-rpath,/home/alan/volk/build/Linux/InGa/Debug Linux/InGa/Debug/libInGa.so -lm
