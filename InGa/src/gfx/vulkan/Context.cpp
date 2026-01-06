@@ -184,7 +184,7 @@ bool CContext::createSurface(const Window& window, VkInstance instance)
         sci.sType =  VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
         sci.display = (struct wl_display*)window.getNativeDisplay();
         sci.surface = (struct wl_surface*)window.getNativeWindow();
-        return vkCreateWaylandSurfaceKHR(m_instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
+        return vkCreateWaylandSurfaceKHR(instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
     }
     else if (backend == EWindowBackend::X11)
     {
@@ -192,7 +192,7 @@ bool CContext::createSurface(const Window& window, VkInstance instance)
         sci.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
         sci.dpy = (Display*)window.getNativeDisplay();
         sci.window = (::Window)(uintptr_t)window.getNativeWindow();
-        return vkCreateXlibSurfaceKHR(m_instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
+        return vkCreateXlibSurfaceKHR(instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
     }
     else if (backend == EWindowBackend::XCB)
     {
@@ -200,7 +200,7 @@ bool CContext::createSurface(const Window& window, VkInstance instance)
         sci.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
         sci.dpy = (Display*)window.getNativeDisplay();
         sci.window = (::Window)(uintptr_t)window.getNativeWindow();
-        return vkCreateXlibSurfaceKHR(m_instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
+        return vkCreateXlibSurfaceKHR(instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
     }
 #endif
 

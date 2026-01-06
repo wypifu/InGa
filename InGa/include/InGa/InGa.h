@@ -1,8 +1,7 @@
 #ifndef INGA_H
 #define INGA_H
 
-#include "core/Allocator.h"
-#include "core/Log.h"
+#include "core/log.h"
 #include <exception>
 
 namespace Inga
@@ -16,17 +15,7 @@ namespace Inga
         const char* logFile ;
     };
 
-    EngineConfig getDefaultEngineConfig()
-    {
-        EngineConfig conf = {};
-        conf.maxPageCount    = 64;
-        conf.pageSize        = 16 * 1024 * 1024;
-        conf.logLevel   = LogLevel::eVERBOSE;
-        conf.logOutput = LogOutput::eALLOUT;
-        conf.logFile = "logs/inga_latest.log";
-
-        return conf;
-    }
+    EngineConfig INGA_API getDefaultEngineConfig();
 }
 
 

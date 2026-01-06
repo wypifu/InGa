@@ -2,7 +2,7 @@
 #include <InGa/gfx/RenderDevice.h>
 #include <InGa/gfx/Context.h>
 #include <InGa/core/log.h>
-#include <InGa/inga.h>
+#include <InGa/InGa.h>
 
 using namespace Inga;
 

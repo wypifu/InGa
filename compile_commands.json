@@ -1,32 +1,56 @@
 [
 {
-  "directory": "/home/alan/volk/build/InGa",
-  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/allocator.cpp.o -c /home/alan/volk/InGa/src/core/allocator.cpp",
-  "file": "/home/alan/volk/InGa/src/core/allocator.cpp",
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/Window.cpp.o -c /home/alan/InGa/InGa/src/core/Window.cpp",
+  "file": "/home/alan/InGa/InGa/src/core/Window.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/Window.cpp.o"
+},
+{
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/allocator.cpp.o -c /home/alan/InGa/InGa/src/core/allocator.cpp",
+  "file": "/home/alan/InGa/InGa/src/core/allocator.cpp",
   "output": "InGa/CMakeFiles/InGa.dir/src/core/allocator.cpp.o"
 },
 {
-  "directory": "/home/alan/volk/build/InGa",
-  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/log.cpp.o -c /home/alan/volk/InGa/src/core/log.cpp",
-  "file": "/home/alan/volk/InGa/src/core/log.cpp",
-  "output": "InGa/CMakeFiles/InGa.dir/src/core/log.cpp.o"
-},
-{
-  "directory": "/home/alan/volk/build/InGa",
-  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/clock.cpp.o -c /home/alan/volk/InGa/src/core/clock.cpp",
-  "file": "/home/alan/volk/InGa/src/core/clock.cpp",
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/clock.cpp.o -c /home/alan/InGa/InGa/src/core/clock.cpp",
+  "file": "/home/alan/InGa/InGa/src/core/clock.cpp",
   "output": "InGa/CMakeFiles/InGa.dir/src/core/clock.cpp.o"
 },
 {
-  "directory": "/home/alan/volk/build/InGa",
-  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -I/home/alan/volk/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/timer.cpp.o -c /home/alan/volk/InGa/src/core/timer.cpp",
-  "file": "/home/alan/volk/InGa/src/core/timer.cpp",
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/log.cpp.o -c /home/alan/InGa/InGa/src/core/log.cpp",
+  "file": "/home/alan/InGa/InGa/src/core/log.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/core/log.cpp.o"
+},
+{
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/core/timer.cpp.o -c /home/alan/InGa/InGa/src/core/timer.cpp",
+  "file": "/home/alan/InGa/InGa/src/core/timer.cpp",
   "output": "InGa/CMakeFiles/InGa.dir/src/core/timer.cpp.o"
 },
 {
-  "directory": "/home/alan/volk/build/IngaDemo",
-  "command": "/usr/sbin/c++  -I/home/alan/volk/InGa/include -I/home/alan/volk/external/Vulkan-SDK/include -std=gnu++23 -o CMakeFiles/IngaDemo.dir/src/main.cpp.o -c /home/alan/volk/IngaDemo/src/main.cpp",
-  "file": "/home/alan/volk/IngaDemo/src/main.cpp",
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/gfx/vulkan/Context.cpp.o -c /home/alan/InGa/InGa/src/gfx/vulkan/Context.cpp",
+  "file": "/home/alan/InGa/InGa/src/gfx/vulkan/Context.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/gfx/vulkan/Context.cpp.o"
+},
+{
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/gfx/vulkan/RenderDevice.cpp.o -c /home/alan/InGa/InGa/src/gfx/vulkan/RenderDevice.cpp",
+  "file": "/home/alan/InGa/InGa/src/gfx/vulkan/RenderDevice.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/gfx/vulkan/RenderDevice.cpp.o"
+},
+{
+  "directory": "/home/alan/InGa/build/InGa",
+  "command": "/usr/sbin/c++ -DINGA_BUILD_DLL -DInGa_EXPORTS -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -I/home/alan/InGa/InGa/src -std=gnu++23 -fPIC -Wall -Wextra -fvisibility=hidden -msse4.1 -o CMakeFiles/InGa.dir/src/gfx/vulkan/vk_types.cpp.o -c /home/alan/InGa/InGa/src/gfx/vulkan/vk_types.cpp",
+  "file": "/home/alan/InGa/InGa/src/gfx/vulkan/vk_types.cpp",
+  "output": "InGa/CMakeFiles/InGa.dir/src/gfx/vulkan/vk_types.cpp.o"
+},
+{
+  "directory": "/home/alan/InGa/build/IngaDemo",
+  "command": "/usr/sbin/c++ -D_CRT_SECURE_NO_WARNINGS -I/home/alan/InGa/InGa/include -std=gnu++23 -o CMakeFiles/IngaDemo.dir/src/main.cpp.o -c /home/alan/InGa/IngaDemo/src/main.cpp",
+  "file": "/home/alan/InGa/IngaDemo/src/main.cpp",
   "output": "IngaDemo/CMakeFiles/IngaDemo.dir/src/main.cpp.o"
 }
 ]

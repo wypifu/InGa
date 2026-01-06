@@ -18,6 +18,7 @@ endif()
 
 # --- Source Collection ---
 file(GLOB_RECURSE INGA_SRC 
+    "src/*.cpp"
     "src/core/*.cpp"
     "src/gfx/*.cpp"
 )
