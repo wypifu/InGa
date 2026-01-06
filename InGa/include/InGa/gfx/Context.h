@@ -17,7 +17,7 @@ namespace Inga
         CContext(CRenderDevice* device);
         ~CContext();
 
-        bool setupSwapchain(const Window& window, CRenderDevice * cdevice);
+        bool setupSwapchain(const Window& window);
         bool initialize(const SContextInfo& info);
         void update();
         void draw();
@@ -26,12 +26,11 @@ namespace Inga
         void cleanup();
 private:
 
-    bool createSurface(const Window & window);
+    bool createSurface(const Window & window, VkInstance instance);
 
     private:
         CRenderDevice* m_renderDevice = nullptr;
         SSwapchain m_swapchain;
-        VkInstance m_instance;
     };
 }
 

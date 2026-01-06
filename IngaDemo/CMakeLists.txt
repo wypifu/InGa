@@ -5,6 +5,8 @@ add_executable(IngaDemo
   src/main.cpp
 )
 
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 # Linkage au moteur
 target_link_libraries(IngaDemo PRIVATE InGa)
 

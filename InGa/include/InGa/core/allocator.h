@@ -36,17 +36,17 @@ namespace Inga
 }
 
 extern "C++"{
-INGA_API void* operator new(size_t size);
-INGA_API void* operator new[](size_t size);
-INGA_API void operator delete(void* ptr) noexcept;
-INGA_API void operator delete[](void* ptr) noexcept;
+void* operator new(size_t size);
+void* operator new[](size_t size);
+void operator delete(void* ptr) noexcept;
+void operator delete[](void* ptr) noexcept;
 
 // --- Signatures Spécifiques au Debug ---
 #ifdef INGA_DEBUG
     // Permet le tracking précis : new(__FILE__, __LINE__) MyClass
-    INGA_API void* operator new(size_t size, const char* file, int line);
-    INGA_API void* operator new[](size_t size, const char* file, int line);
-    INGA_API void operator delete(void* ptr, const char* file, int line) noexcept;
+    void* operator new(size_t size, const char* file, int line);
+    void* operator new[](size_t size, const char* file, int line);
+    void operator delete(void* ptr, const char* file, int line) noexcept;
 #endif
 }
 

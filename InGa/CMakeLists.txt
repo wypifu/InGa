@@ -71,10 +71,13 @@ set_target_properties(InGa PROPERTIES
     INSTALL_RPATH ""
 )
 
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if(NOT MSVC)
     target_compile_options(InGa PRIVATE -Wall -Wextra -fvisibility=hidden -msse4.1)
 else()
-    target_compile_options(InGa PRIVATE /W4 /msse4.1)
+    target_compile_options(InGa PRIVATE /W4)
+    add_compile_options(/wd4251) # wd = Write Disable (silence warning 4251)
 endif()

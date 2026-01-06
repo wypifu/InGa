@@ -33,16 +33,32 @@ CContext::~CContext()
 {
 }
 
-bool CContext::setupSwapchain(const Window& window, CRenderDevice * cdevice)
+bool CContext::setupSwapchain(const Window& window)
 {
-    m_renderDevice = cdevice;
-    VkDevice device =  cdevice->getLogicalDevice();
+    if (!m_renderDevice) return false;
+    VkDevice device =  m_renderDevice->getLogicalDevice();
     
     // 1. Création de la Surface (Multi-backend)
-    if (!createSurface(window))
+    if (!createSurface(window, m_renderDevice->getInstance()))
     {
         return false;
     }
+
+    // Your "Old Code" - Works everywhere without #ifdef
+    VkBool32 supported = VK_FALSE;
+    vkGetPhysicalDeviceSurfaceSupportKHR(
+        m_renderDevice->getPhysicalDevice(),
+        m_renderDevice->getPresentQueueFamily(),
+        m_swapchain.m_surface,
+        &supported
+    );
+
+    if (!supported)
+    {
+        INGA_LOG(eFATAL, "VULKAN", "GPU cannot present to this surface.");
+        return false;
+    }
+
 
     // 2. Configuration (On pourra automatiser la sélection du format plus tard)
     m_swapchain.m_format = VK_FORMAT_B8G8R8A8_SRGB;
@@ -147,7 +163,7 @@ bool CRenderDevice::findPresentQueue(VkSurfaceKHR surface)
     return true;
 }
 
-bool CContext::createSurface(const Window& window)
+bool CContext::createSurface(const Window& window, VkInstance instance)
 {
   #if defined(INGA_PLATFORM_WINDOWS)
     if (window.getBackend() == EWindowBackend::Win32)
@@ -156,7 +172,7 @@ bool CContext::createSurface(const Window& window)
         sci.hwnd = (HWND)window.getNativeWindow();
         sci.hinstance = (HINSTANCE)window.getHInstance();
         
-        return vkCreateWin32SurfaceKHR(m_instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
+        return vkCreateWin32SurfaceKHR(instance, &sci, nullptr, &m_swapchain.m_surface) == VK_SUCCESS;
     }
 
 #elif defined(INGA_PLATFORM_LINUX)
@@ -194,7 +210,7 @@ bool CContext::createSurface(const Window& window)
 
 void CContext::setupSyncObjects()
 {
-    U32 imageCount = m_swapchain.m_images.size();
+    U32 imageCount = static_cast<U32>(m_swapchain.m_images.size());
     // Ta logique : N-1 images en vol
     U32 maxFramesInFlight = (imageCount > 1) ? (imageCount - 1) : 1;
 
@@ -224,18 +240,11 @@ void CContext::cleanup()
 
     m_swapchain.cleanup(logicalDevice);
 
-    for (U32 i = 0; i < m_swapchain.m_imageAvailableSemaphores.size(); i++)
-    {
-        vkDestroySemaphore(logicalDevice, m_swapchain.m_imageAvailableSemaphores[i], nullptr);
-        vkDestroySemaphore(logicalDevice, m_swapchain.m_renderFinishedSemaphores[i], nullptr);
-        vkDestroyFence(logicalDevice, m_swapchain.m_inFlightFences[i], nullptr);
-    }
-
     // We destroy the surface here using the stored handle
     // But we DO NOT destroy m_instance here, as it belongs to CRenderDevice
     if (m_swapchain.m_surface != VK_NULL_HANDLE)
     {
-        vkDestroySurfaceKHR(m_instance, m_swapchain.m_surface, nullptr);
+        vkDestroySurfaceKHR(m_renderDevice->getInstance(), m_swapchain.m_surface, nullptr);
         m_swapchain.m_surface = VK_NULL_HANDLE;
     }
 

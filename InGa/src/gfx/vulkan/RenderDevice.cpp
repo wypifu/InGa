@@ -37,6 +37,11 @@ namespace Inga
             return false;
         }
 
+        if (!createLogicalDevice())
+        {
+            INGA_LOG(eFATAL, "VULKAN", "Failed to create shared Logical Device.");
+            return false;
+        }
 
         INGA_LOG(eINFO, "VULKAN", "RenderDevice initialized successfully.");
         return true;
@@ -44,11 +49,17 @@ namespace Inga
 
 void CRenderDevice::shutdown()
 {
-  if (m_instance != VK_NULL_HANDLE)
-  {
-      vkDestroyInstance(m_instance, nullptr);
-      m_instance = VK_NULL_HANDLE;
-  }
+	if (m_logicalDevice != VK_NULL_HANDLE)
+	{
+		vkDeviceWaitIdle(m_logicalDevice);
+        vkDestroyDevice(m_logicalDevice, nullptr);
+        m_logicalDevice = VK_NULL_HANDLE;
+	}
+	if (m_instance != VK_NULL_HANDLE)
+	{
+		vkDestroyInstance(m_instance, nullptr);
+		m_instance = VK_NULL_HANDLE;
+	}
 }
 
 bool CRenderDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
@@ -81,12 +92,25 @@ bool CRenderDevice::createLogicalDevice()
       return false;
   }
 
-  // 2. Préparation des queues (Gestion manuelle pour éviter std::set)
-  U32 uniqueFamilies[3] = { m_graphicsQueueFamily, m_computeQueueFamily, m_transferQueueFamily };
+  m_presentQueueFamily = 0xFFFFFFFF;
+
+#if defined(INGA_PLATFORM_WINDOWS)
+  // WINDOWS SPECIFIC: Check support without needing a VkSurfaceKHR
+  if (vkGetPhysicalDeviceWin32PresentationSupportKHR(m_physicalDevice, m_graphicsQueueFamily))
+  {
+      m_presentQueueFamily = m_graphicsQueueFamily;
+  }
+#elif defined(INGA_PLATFORM_LINUX)
+  // LINUX: We can't easily check without a surface handle (X11 Display or Wayland handle).
+  // We assume the GFX queue is the one, and validate it LATER in CContext.
+  m_presentQueueFamily = m_graphicsQueueFamily;
+#endif
+
+  U32 uniqueFamilies[4] = { m_graphicsQueueFamily, m_computeQueueFamily, m_transferQueueFamily, m_presentQueueFamily};
   U32 uniqueCount = 0;
 
   // Petit tri manuel pour identifier les indices uniques
-  for(U32 i = 0; i < 3; ++i)
+  for(U32 i = 0; i < 4; ++i)
   {
     bool alreadyExists = false;
     for(U32 j = 0; j < uniqueCount; ++j)
@@ -111,18 +135,19 @@ bool CRenderDevice::createLogicalDevice()
   }
 
   // 3. Activation des Features modernes (Vulkan 1.2+)
-  VkPhysicalDeviceBufferDeviceAddressFeatures bdaFeatures{};
-  bdaFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+  // 3.1. Initialize all to zero first
+  VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES };
+  VkPhysicalDeviceBufferDeviceAddressFeatures bdaFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES };
+  VkPhysicalDeviceFeatures2 deviceFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+
+  //3.2 set feature
+  dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
   bdaFeatures.bufferDeviceAddress = VK_TRUE;
 
-  VkPhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures{};
-  dynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
-  dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
-  dynamicRenderingFeatures.pNext = &bdaFeatures;
-
-  VkPhysicalDeviceFeatures2 deviceFeatures2{};
-  deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-  deviceFeatures2.pNext = &dynamicRenderingFeatures;
+  // 3.3. Link the chain (Top -> Down)
+  deviceFeatures2.pNext = &bdaFeatures;
+  bdaFeatures.pNext = &dynamicRenderingFeatures;
+  dynamicRenderingFeatures.pNext = nullptr; // Explicitly terminate
 
   // 4. Extensions (InGa::Vector utilisé ici)
   Vector<const char*> deviceExtensions;
@@ -130,6 +155,13 @@ bool CRenderDevice::createLogicalDevice()
   deviceExtensions.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
   VkDeviceCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  createInfo.pNext = &deviceFeatures2;
+  createInfo.queueCreateInfoCount = static_cast<U32>(queueCreateInfos.size());
+  createInfo.pQueueCreateInfos = queueCreateInfos.data();
+  createInfo.enabledExtensionCount = static_cast<U32>(deviceExtensions.size());
+  createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
 
   Vector<const char*> validationLayers;
   if (m_enableValidation)
@@ -143,13 +175,6 @@ bool CRenderDevice::createLogicalDevice()
       createInfo.enabledLayerCount = 0;
   }
   
-  createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-  createInfo.queueCreateInfoCount = static_cast<U32>(queueCreateInfos.size());
-  createInfo.pQueueCreateInfos = queueCreateInfos.data();
-  createInfo.pNext = &deviceFeatures2;
-  createInfo.enabledExtensionCount = static_cast<U32>(deviceExtensions.size());
-  createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-
   if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_logicalDevice) != VK_SUCCESS) 
   {
     INGA_LOG(eFATAL, "VULKAN", "Failed to create logical device!");
@@ -159,6 +184,7 @@ bool CRenderDevice::createLogicalDevice()
   vkGetDeviceQueue(m_logicalDevice, m_graphicsQueueFamily, 0, &m_graphicsQueue);
   vkGetDeviceQueue(m_logicalDevice, m_computeQueueFamily,  0, &m_computeQueue);
   vkGetDeviceQueue(m_logicalDevice, m_transferQueueFamily, 0, &m_transferQueue);
+  vkGetDeviceQueue(m_logicalDevice, m_presentQueueFamily, 0, &m_presentQueue);
 
   INGA_LOG(eINFO, "VULKAN", "Logical Device Ready. G:%d C:%d T:%d", 
            m_graphicsQueueFamily, m_computeQueueFamily, m_transferQueueFamily);
@@ -272,13 +298,16 @@ bool CRenderDevice::createInstance(const char* app_name, bool enable_validation)
         }
     }
 
+    INGA_LOG(eDEBUG, "VULKAN", "attempting vkCreateInstance");
     // 4. Final Creation
     VkResult result = vkCreateInstance(&create_info, nullptr, &m_instance);
     if (result != VK_SUCCESS)
     {
+		INGA_LOG(eERROR, "VULKAN", "vkCreateInstance FAILED with VkResult: %d", result);
         return false;
     }
 
+		INGA_LOG(eDEBUG, "VULKAN", "vkCreateInstance SUCCESS. m_instance vlaue : %p", (void*) m_instance);
     return true;
 }
 
@@ -378,6 +407,7 @@ bool CRenderDevice::checkDeviceQueueSupport(VkPhysicalDevice device)
 
     // Le GPU est valide si on a au moins une queue Graphics
     return (m_graphicsQueueFamily != 0xFFFFFFFF);
+
 }
 
 
@@ -388,15 +418,15 @@ I32 CRenderDevice::rateDeviceSuitability(VkPhysicalDevice device)
     vkGetPhysicalDeviceProperties(device, &props);
     vkGetPhysicalDeviceFeatures(device, &features);
 
-    VkPhysicalDeviceBufferDeviceAddressFeatures bda_features {};
-    bda_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
     VkPhysicalDeviceDynamicRenderingFeatures dynamic_features = {};
     dynamic_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+    VkPhysicalDeviceBufferDeviceAddressFeatures bda_features {};
+    bda_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+    bda_features.pNext = &dynamic_features;
     
     VkPhysicalDeviceFeatures2 device_features{};
     device_features.sType =  VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     device_features.pNext = &bda_features;
-    bda_features.pNext = &dynamic_features;
 
     vkGetPhysicalDeviceFeatures2(device, &device_features);
     

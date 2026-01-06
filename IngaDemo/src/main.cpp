@@ -2,17 +2,21 @@
 #include <InGa/gfx/RenderDevice.h>
 #include <InGa/gfx/Context.h>
 #include <InGa/core/log.h>
+#include <InGa/inga.h>
 
 using namespace Inga;
 
 I32 main(I32 argc, char** argv)
 {
-  Inga::Log::init(Inga::eDEBUG, LogOutput::eALLOUT);
-    INGA_LOG(eINFO, "DEMO", "Beginning shutdown...");
-  return 0;
+    // 0. START THE ENGINE CORE
+    // 64 groups, 16MB default page size
+    Inga::EngineConfig conf = Inga::getDefaultEngineConfig();
+    INGA_BEGIN(conf)
+
+    INGA_LOG(eINFO, "CORE", "InGa Engine Core Started.");
     // 1. Create the OS Window
     // This is where m_hInstance (Win32) or Display* (Linux) are captured
-  Inga::Window window;
+    Inga::Window window;
     if (!window.create(1280, 720, "InGa Engine - Startup/Shutdown Demo"))
     {
         INGA_LOG(eFATAL, "DEMO", "Failed to create window.");
@@ -31,7 +35,7 @@ I32 main(I32 argc, char** argv)
     // 3. Setup the Context
     // Creates Surface, Logical Device, and Swapchain
     CContext context(&device);
-    if (!context.setupSwapchain(window, &device))
+    if (!context.setupSwapchain(window))
     {
         INGA_LOG(eFATAL, "DEMO", "Failed to setup swapchain context.");
         return -1;
@@ -42,12 +46,12 @@ I32 main(I32 argc, char** argv)
     // 4. Simple Wait Loop
     // We poll events to keep the window responsive during the wait
     U32 frameCount = 0;
-    while (window.isOpen() && frameCount < 300) // Approx 3 seconds at 100fps
+    while (window.isOpen()) // Approx 3 seconds at 100fps
     {
         window.pollEvents();
-        
+
         // No rendering yet, just keeping the window alive
-        
+
         frameCount++;
         // Small sleep could go here to avoid 100% CPU usage
     }
@@ -68,6 +72,6 @@ I32 main(I32 argc, char** argv)
     window.close();
 
     INGA_LOG(eINFO, "DEMO", "Shutdown complete. Goodbye.");
-    
+    INGA_END()
     return 0;
 }

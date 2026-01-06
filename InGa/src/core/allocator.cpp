@@ -6,6 +6,7 @@
 
 #include <chrono> // On l'utilise ici seulement pour la mesure brute
 
+
 // --- Statistiques de performance internes ---
 #ifdef INGA_DEBUG
 static U64 g_total_alloc_time_us = 0;
@@ -89,12 +90,12 @@ namespace Inga
               return 0xFFFF;
         }
 
-        U16 id = g_group_count++;
+        U16 id = static_cast<U16>(g_group_count++);
         MemoryGroup* group = &g_groups[id];
 
         INGA_MUTEX_UNLOCK(&g_global_mutex);
 
-        pthread_mutex_init(&group->mutex, nullptr);
+        INGA_MUTEX_INIT(&group->mutex);
 
         group->id = id;
         group->name = info.Name;
@@ -168,14 +169,14 @@ static bool createNewPage(MemoryGroup* group)
     }
 
     page->groupId = group->id;
-    page->pageId = newPageIndex;
+    page->pageId = static_cast<U16>(newPageIndex);
 
     BlockHeader* firstBlock = (BlockHeader*)page->data;
     firstBlock->canary = 0x494E4741;
     firstBlock->size = group->pageSize;
     firstBlock->used = INGA_FALSE;
     firstBlock->groupId = group->id;
-    firstBlock->pageId = newPageIndex;
+    firstBlock->pageId = static_cast<U16>(newPageIndex);
 
     // Liens physiques (Ordre sur la RAM)
     firstBlock->next = nullptr;
@@ -255,7 +256,7 @@ void* Allocator::alloc(U64 size, U32 align, U16 groupId, const char* file, I32 l
                     nextB->size = remaining;
                     nextB->used = INGA_FALSE;
                     nextB->groupId = groupId;
-                    nextB->pageId = p;
+                    nextB->pageId = static_cast<U16>(p);
                     
                     // Liens physiques
                     nextB->next = current->next;
@@ -658,7 +659,7 @@ void* Allocator::realloc(void* ptr, U64 newSize, U32 align, const char* file, I3
 }
 
 
-INGA_API void* operator new(size_t size)
+void* operator new(size_t size)
 {
     #ifdef INGA_DEBUG
         return Inga::Allocator::alloc((U64)size, 16, 0, "Global New", 0);
@@ -667,7 +668,7 @@ INGA_API void* operator new(size_t size)
     #endif
 }
 
-INGA_API void* operator new[](size_t size)
+void* operator new[](size_t size)
 {
     #ifdef INGA_DEBUG
         return Inga::Allocator::alloc((U64)size, 16, 0, "Global New[]", 0);
@@ -676,22 +677,22 @@ INGA_API void* operator new[](size_t size)
     #endif
 }
 
-INGA_API void operator delete(void* ptr) noexcept
+void operator delete(void* ptr) noexcept
 {
     Inga::Allocator::free(ptr);
 }
 
-INGA_API void operator delete[](void* ptr) noexcept
+void operator delete[](void* ptr) noexcept
 {
     Inga::Allocator::free(ptr);
 }
 
-INGA_API void operator delete(void* ptr, std::size_t size) noexcept {
+void operator delete(void* ptr, std::size_t size) noexcept {
     (void)size; // On ignore la taille car notre header la connaît déjà
     Inga::Allocator::free(ptr);
 }
 
-INGA_API void operator delete[](void* ptr, std::size_t size) noexcept {
+void operator delete[](void* ptr, std::size_t size) noexcept {
     (void)size;
     Inga::Allocator::free(ptr);
 }
@@ -700,17 +701,17 @@ INGA_API void operator delete[](void* ptr, std::size_t size) noexcept {
 
 // --- Implémentations Debug ---
 #ifdef INGA_DEBUG
-INGA_API void* operator new(size_t size, const char* file, int line)
+void* operator new(size_t size, const char* file, int line)
 {
     return Inga::Allocator::alloc((U64)size, 16, 0, file, line);
 }
 
-INGA_API void* operator new[](size_t size, const char* file, int line)
+void* operator new[](size_t size, const char* file, int line)
 {
     return Inga::Allocator::alloc((U64)size, 16, 0, file, line);
 }
 
-INGA_API void operator delete(void* ptr, [[maybe_unused]] const char* file, [[maybe_unused]] int line) noexcept
+void operator delete(void* ptr, [[maybe_unused]] const char* file, [[maybe_unused]] int line) noexcept
 {
   
     Inga::Allocator::free(ptr);

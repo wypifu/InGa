@@ -77,19 +77,3 @@ typedef uint8_t  B8;
     #define INGA_ASSERT(condition, message) // Ne fait rien en mode Release
 #endif
 
-// --- MUTEX ---
-#if defined(_WIN32)
-    #include <windows.h>
-    typedef CRITICAL_SECTION IngaMutex;
-    #define INGA_MUTEX_INIT(m)    InitializeCriticalSection(m)
-    #define INGA_MUTEX_LOCK(m)    EnterCriticalSection(m)
-    #define INGA_MUTEX_UNLOCK(m)  LeaveCriticalSection(m)
-    #define INGA_MUTEX_DESTROY(m) DeleteCriticalSection(m)
-#else
-    #include <pthread.h>
-    typedef pthread_mutex_t IngaMutex;
-    #define INGA_MUTEX_INIT(m)    pthread_mutex_init(m, NULL)
-    #define INGA_MUTEX_LOCK(m)    pthread_mutex_lock(m)
-    #define INGA_MUTEX_UNLOCK(m)  pthread_mutex_unlock(m)
-    #define INGA_MUTEX_DESTROY(m) pthread_mutex_destroy(m)
-#endif
